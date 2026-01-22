@@ -25,24 +25,27 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final chatController = context.watch<ChatController>();
-    final log = Provider.of<AuthController>(context);
+    final chatController = Provider.of<ChatController>(context);
 
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
         title: AppText(
           name: 'Chatify',
           fontsize: 25,
           fontWeight: FontWeight.bold,
+          color: const Color.fromARGB(255, 24, 108, 156),
         ),
         elevation: 1,
         actions: [
+          IconButton(onPressed: () {}, icon: Icon(Icons.qr_code_scanner)),
           PopupMenuButton<String>(
             onSelected: (value) {
               if (value == 'settings') {
               } else if (value == 'logout') {
-                showLogoutDialog(context, log);
+                showLogoutDialog(context);
               }
             },
             itemBuilder: (context) => const [
@@ -54,15 +57,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ],
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.brown, Color.fromARGB(255, 19, 11, 111)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-        ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(40),
           child: Padding(
@@ -70,15 +64,16 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Container(
               height: 40,
               decoration: BoxDecoration(
-                color: Colors.grey,
-                borderRadius: BorderRadius.circular(20),
+                color: const Color.fromARGB(255, 220, 216, 216),
+                borderRadius: BorderRadius.circular(30),
               ),
               child: TextField(
                 controller: search,
-                style: const TextStyle(color: Colors.black),
+
+                style: const TextStyle(color: Colors.white),
                 decoration: const InputDecoration(
                   hintText: 'Search users...',
-                  hintStyle: TextStyle(color: Colors.white70),
+                  hintStyle: TextStyle(color: Colors.black),
                   prefixIcon: Icon(Icons.search, color: Colors.white),
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.symmetric(vertical: 10),
@@ -111,9 +106,14 @@ class _HomeScreenState extends State<HomeScreen> {
             itemCount: users.length,
             itemBuilder: (context, index) {
               final user = users[index];
-              final userName = user['name'] ?? user['email'] ?? 'Unknown';
+              final userName =
+                  (user['name'] != null &&
+                      user['name'].toString().trim().isNotEmpty)
+                  ? user['name']
+                  : user['email'];
 
               return UserTile(
+                name: userName[0],
                 text: userName,
                 onTap: () {
                   Navigator.push(
@@ -126,6 +126,39 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   );
                 },
+                onLongPress: () async {
+                  final confirm = await showDialog<bool>(
+                    context: context,
+                    builder: (_) => AlertDialog(
+                      title: const Text('Delete user?'),
+                      content: Text(
+                        'Are you sure you want to delete $userName?',
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, false),
+                          child: const Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, true),
+                          child: const Text(
+                            'Delete',
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+
+                  if (confirm == true) {
+                    await context.read<ChatController>().deleteUser(
+                      user['uid'],
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('$userName deleted')),
+                    );
+                  }
+                },
               );
             },
           );
@@ -134,29 +167,36 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void showLogoutDialog(BuildContext context, AuthController log) {
+  void showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Logout'),
-        content: const Text('Are you sure you want to logout?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              log.logout();
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => LoginScreen()),
-              );
-            },
-            child: const Text('Logout', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Logout'),
+          content: const Text('Are you sure you want to logout?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.pop(dialogContext);
+                await context.read<AuthController>().logout();
+
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                  (route) => false,
+                );
+              },
+              child: const Text('Logout', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
     );
   }
 }

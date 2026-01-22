@@ -1,10 +1,26 @@
+import 'dart:ui';
+
+import 'package:chatify/view/widget/app_text.dart';
 import 'package:flutter/material.dart';
 
 class UserTile extends StatelessWidget {
   final String text;
+  final String name;
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
 
-  const UserTile({super.key, required this.text, this.onTap});
+  const UserTile({
+    super.key,
+    required this.text,
+    required this.name,
+    this.onTap,
+    this.onLongPress,
+  });
+
+  String formatName(String name) {
+    if (name.isEmpty) return name;
+    return name[0].toUpperCase() + name.substring(1).toLowerCase();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,22 +29,27 @@ class UserTile extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(15),
         onTap: onTap,
+        onLongPress: onLongPress,
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Row(
             children: [
-              const CircleAvatar(radius: 18, child: Icon(Icons.person)),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  text,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
+              CircleAvatar(
+                radius: 18,
+                child: AppText(
+                  name: name[0].toUpperCase(),
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue,
                 ),
               ),
-              const Icon(Icons.chevron_right, color: Colors.grey),
+              const SizedBox(width: 12),
+              Expanded(
+                child: AppText(
+                  name: formatName(text),
+                  fontsize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             ],
           ),
         ),

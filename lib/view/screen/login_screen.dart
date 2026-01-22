@@ -28,6 +28,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -80,45 +81,45 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: value.isLoading
                           ? null
                           : () async {
-                              if (_formKey.currentState!.validate()) {
-                                final success = await value.signIn(
-                                  email.text.trim(),
-                                  password.text.trim(),
-                                );
+                              if (!_formKey.currentState!.validate()) return;
 
-                                if (success) {
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => BottombarScreen(),
+                              final success = await value.signIn(
+                                email.text.trim(),
+                                password.text.trim(),
+                              );
+
+                              if (!mounted)
+                                return; // ✅ Check if widget is still active
+
+                              if (success) {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => BottombarScreen(),
+                                  ),
+                                );
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: AppText(
+                                      name: 'Invalid email or password',
                                     ),
-                                  );
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                        'Invalid email or password',
-                                      ),
-                                    ),
-                                  );
-                                }
+                                  ),
+                                );
                               }
                             },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
                       child: value.isLoading
-                          ? const CircularProgressIndicator(color: Colors.black)
-                          : AppText(
-                              name: 'Submit',
-                              fontWeight: FontWeight.bold,
-                            ),
+                          ? SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 3,
+                                color: Colors.white,
+                              ),
+                            )
+                          : AppText(name: 'Submit'),
                     ),
                   ),
-
                   const SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,

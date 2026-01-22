@@ -15,21 +15,23 @@ class ChatScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final chat = context.read<ChatController>();
+    final chat = Provider.of<ChatController>(context);
 
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 239, 235, 235),
       appBar: AppBar(
-        leadingWidth: 70,
         leading: const BackButton(),
-        title: AppText(name: receiveName, color: Colors.white),
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.brown, Color.fromARGB(255, 19, 11, 111)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+        title: Row(
+          children: [
+            CircleAvatar(
+              child: AppText(
+                name: receiveName[0].toUpperCase(),
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
+            SizedBox(width: 10),
+            AppText(name: receiveName),
+          ],
         ),
       ),
       body: Column(
@@ -57,14 +59,14 @@ class ChatScreen extends StatelessWidget {
               itemCount: messages.length,
               itemBuilder: (context, index) {
                 final data = messages[index].data() as Map<String, dynamic>;
-                final isMe = data['senderId'] == chat.currentUserId;
+                final load = data['senderId'] == chat.currentUserId;
                 return Align(
-                  alignment: isMe
+                  alignment: load
                       ? Alignment.centerRight
                       : Alignment.centerLeft,
                   child: ChatBubble(
                     message: data['message'],
-                    currentUser: isMe,
+                    currentUser: load,
                   ),
                 );
               },

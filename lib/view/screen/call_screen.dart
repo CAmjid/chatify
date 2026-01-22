@@ -15,21 +15,7 @@ class CallsScreen extends StatelessWidget {
       appBar: AppBar(
         leadingWidth: 70,
 
-        title: AppText(
-          name: 'Update',
-          color: Colors.white,
-          fontsize: 20,
-          fontWeight: FontWeight.w400,
-        ),
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.brown, Color.fromARGB(255, 19, 11, 111)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-        ),
+        title: AppText(name: 'Call', fontsize: 20, fontWeight: FontWeight.bold),
       ),
       body: ListView.builder(
         itemCount: calls.length,
@@ -37,7 +23,7 @@ class CallsScreen extends StatelessWidget {
           final call = calls[index];
           return ListTile(
             leading: CircleAvatar(child: Text(call['name']![0])),
-            title: Text(call['name']!),
+            title: AppText(name: call['name']!),
             subtitle: AppText(name: call['time']!),
             trailing: Icon(Icons.call_made, color: Colors.green),
             onTap: () {},

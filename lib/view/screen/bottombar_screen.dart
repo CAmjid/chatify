@@ -28,16 +28,28 @@ class _BottombarScreenState extends State<BottombarScreen> {
         },
         selectedItemColor: const Color.fromARGB(255, 38, 20, 142),
         unselectedItemColor: Colors.grey,
-        items: const [
+        selectedFontSize: 12,
+        unselectedFontSize: 11,
+
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.chat_rounded),
+            icon: controller.selectedindex == 0
+                ? Icon(Icons.chat_outlined)
+                : Icon(Icons.chat_rounded),
             label: 'Chats',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.add_circle),
+            icon: controller.selectedindex == 1
+                ? Icon(Icons.add_card_outlined)
+                : Icon(Icons.add_circle),
             label: 'Updates',
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.phone), label: 'Calls'),
+          BottomNavigationBarItem(
+            icon: controller.selectedindex == 2
+                ? Icon(Icons.phone_outlined)
+                : Icon(Icons.phone),
+            label: 'Calls',
+          ),
         ],
       ),
     );

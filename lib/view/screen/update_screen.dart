@@ -8,15 +8,10 @@ class UpdateScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: AppText(name: 'Updates'),
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.brown, Color.fromARGB(255, 19, 11, 111)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
+        title: AppText(
+          name: 'Updates',
+          fontsize: 20,
+          fontWeight: FontWeight.bold,
         ),
       ),
       body: ListView(

@@ -1,3 +1,4 @@
+import 'package:chatify/view/widget/app_text.dart';
 import 'package:flutter/material.dart';
 
 class ChatBubble extends StatelessWidget {
@@ -21,7 +22,9 @@ class ChatBubble extends StatelessWidget {
         maxWidth: MediaQuery.of(context).size.width * 0.75,
       ),
       decoration: BoxDecoration(
-        color: currentUser ? const Color(0xffDCF8C6) : Colors.white,
+        color: currentUser
+            ? const Color.fromARGB(255, 220, 248, 198)
+            : Colors.white,
         borderRadius: BorderRadius.only(
           topLeft: const Radius.circular(16),
           topRight: const Radius.circular(16),
@@ -41,20 +44,21 @@ class ChatBubble extends StatelessWidget {
             ? CrossAxisAlignment.end
             : CrossAxisAlignment.start,
         children: [
-          if (senderName != null) ...[
-            Text(
-              senderName!,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 13,
-                color: Colors.grey.shade700,
-              ),
+          if (senderName != null)
+            AppText(
+              name: senderName!,
+              fontWeight: FontWeight.bold,
+              fontsize: 13,
+              color: Colors.grey.shade700,
             ),
-            const SizedBox(height: 4),
-          ],
-          Text(message, style: const TextStyle(fontSize: 15)),
+
+          if (senderName != null) const SizedBox(height: 4),
+
+          AppText(name: message, fontsize: 15),
         ],
       ),
     );
   }
 }
+
+// const Color(0xffDCF8C6)

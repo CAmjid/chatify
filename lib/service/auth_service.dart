@@ -15,7 +15,7 @@ class AuthService {
       );
       return credential;
     } on FirebaseAuthException catch (e) {
-      throw Exception('SignIn Error: ${e.code} - ${e.message}');
+      throw Exception('SignIn Error: ${e.code}');
     }
   }
 
@@ -24,23 +24,21 @@ class AuthService {
     String email,
     String password,
   ) async {
-    try {
-      final credential = await auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+    final credential = await auth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
 
-      await firestore.collection('Users').doc(credential.user!.uid).set({
-        'uid': credential.user!.uid,
-        'name': name,
-        'email': email,
-        'createdAt': FieldValue.serverTimestamp(),
-      });
-      print(name);
-      return credential;
-    } on FirebaseException catch (e) {
-      throw Exception('error ${e.code}');
-    }
+    await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(credential.user!.uid)
+        .set({
+          'uid': credential.user!.uid,
+          'name': name.trim(),
+          'email': email,
+          'createdAt': FieldValue.serverTimestamp(),
+        }, SetOptions(merge: true));
+    return credential;
   }
 
   Future<void> signOut() async {

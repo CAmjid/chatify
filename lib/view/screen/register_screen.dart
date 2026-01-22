@@ -1,7 +1,8 @@
 import 'package:chatify/controller/auth_controller.dart';
-import 'package:chatify/view/screen/home_screen.dart';
+import 'package:chatify/view/screen/bottombar_screen.dart';
 import 'package:chatify/view/widget/app_text.dart';
 import 'package:chatify/view/widget/custom_textfield.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -29,6 +30,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -90,25 +92,39 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ? null
                           : () async {
                               if (_formKey.currentState!.validate()) {
-                                final success = await value.signUp(
-                                  name.text.trim(),
-                                  email.text.trim(),
-                                  password.text.trim(),
-                                );
+                                try {
+                                  final success = await value.signUp(
+                                    name.text.trim(),
+                                    email.text.trim(),
+                                    password.text.trim(),
+                                  );
 
-                                if (success) {
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => HomeScreen(),
+                                  if (success) {
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => BottombarScreen(),
+                                      ),
+                                    );
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          'Registration failed. Try again',
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                } on FirebaseAuthException catch (e) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(e.message ?? e.code),
                                     ),
                                   );
-                                } else {
+                                } catch (e) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
-                                      content: Text(
-                                        'Register failed. Try again.',
-                                      ),
+                                      content: Text('Something went wrong'),
                                     ),
                                   );
                                 }

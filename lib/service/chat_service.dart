@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:chatify/model/message.dart';
+import '../model/message.dart';
 
 class ChatService {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -18,8 +18,8 @@ class ChatService {
       return snapshot.docs.map((doc) => doc.data()).where((user) {
         final name = (user['name'] ?? '').toString().toLowerCase();
         final email = (user['email'] ?? '').toString().toLowerCase();
-        final q = query.toLowerCase();
-        return name.contains(q) || email.contains(q);
+        return name.contains(query.toLowerCase()) ||
+            email.contains(query.toLowerCase());
       }).toList();
     });
   }
@@ -30,9 +30,12 @@ class ChatService {
 
     final userDoc = await firestore.collection('Users').doc(currUserId).get();
     final senderName =
-        userDoc.data()?['name'] ?? userDoc.data()?['email'] ?? 'Unknown';
+        (userDoc.exists &&
+            (userDoc.data()?['name'] ?? '').toString().trim().isNotEmpty)
+        ? userDoc.data()!['name']
+        : userDoc.data()?['email'] ?? 'Unknown';
 
-    MessageModel newMessage = MessageModel(
+    final newMessage = MessageModel(
       senderId: currUserId,
       senderName: senderName,
       receiverId: receiveId,
@@ -40,9 +43,9 @@ class ChatService {
       timeStamp: timestamp,
     );
 
-    List<String> ids = [currUserId, receiveId];
-    ids.sort();
+    List<String> ids = [currUserId, receiveId]..sort();
     String chatRoomId = ids.join('_');
+
     await firestore
         .collection('chatroom')
         .doc(chatRoomId)
@@ -60,5 +63,25 @@ class ChatService {
         .collection('messages')
         .orderBy('timeStamp', descending: false)
         .snapshots();
+  }
+
+  Future<void> deleteUser(String userId) async {
+    try {
+      await firestore.collection('Users').doc(userId).delete();
+      final chatrooms = await firestore.collection('chatroom').get();
+      for (var room in chatrooms.docs) {
+        if (room.id.contains(userId)) {
+          final messages = await room.reference.collection('messages').get();
+          for (var msg in messages.docs) {
+            await msg.reference.delete();
+          }
+          await room.reference.delete();
+        }
+      }
+      print('User and related messages deleted successfully');
+    } catch (e) {
+      print('Error deleting user: $e');
+      rethrow;
+    }
   }
 }

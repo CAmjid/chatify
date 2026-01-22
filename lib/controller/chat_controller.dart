@@ -1,35 +1,49 @@
-import 'package:chatify/service/chat_service.dart';
+import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
+import '../service/chat_service.dart';
 
 class ChatController extends ChangeNotifier {
-  final ChatService _chatService = ChatService();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final ChatService chatService = ChatService();
+  final FirebaseAuth auth = FirebaseAuth.instance;
 
-  String _searchQuery = '';
+  String searchQuery = '';
 
-  String get currentUserId => _auth.currentUser!.uid;
+  String? get currentUserId => auth.currentUser?.uid;
 
   void updateSearchQuery(String query) {
-    _searchQuery = query.trim();
+    searchQuery = query.trim();
     notifyListeners();
   }
 
   Stream<List<Map<String, dynamic>>> get users {
-    if (_searchQuery.isEmpty) {
-      return _chatService.getUsers();
+    if (searchQuery.isEmpty) {
+      return chatService.getUsers();
     } else {
-      return _chatService.searchUsers(_searchQuery);
+      return chatService.searchUsers(searchQuery);
     }
   }
 
   Stream<QuerySnapshot> messages(String otherUserId) {
-    return _chatService.getMessage(currentUserId, otherUserId);
+    final uid = currentUserId;
+    if (uid == null) {
+      return const Stream.empty();
+    }
+    return chatService.getMessage(uid, otherUserId);
   }
 
   Future<void> send(String receiverId, String message) async {
     if (message.trim().isEmpty) return;
-    await _chatService.sendMessage(receiverId, message);
+    await chatService.sendMessage(receiverId, message);
+  }
+
+  Future<void> deleteUser(String userId) async {
+    try {
+      await chatService.deleteUser(userId);
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error deleting user: $e');
+      rethrow;
+    }
   }
 }

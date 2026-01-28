@@ -1,5 +1,6 @@
 import 'package:chatify/controller/auth_controller.dart';
 import 'package:chatify/view/screen/bottombar_screen.dart';
+import 'package:chatify/view/screen/login_screen.dart';
 import 'package:chatify/view/widget/app_text.dart';
 import 'package:chatify/view/widget/custom_textfield.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -143,6 +144,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               fontWeight: FontWeight.bold,
                             ),
                     ),
+                  ),
+                  SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const AppText(
+                        name: 'Already have account?',
+                        color: Colors.white,
+                      ),
+                      const SizedBox(width: 10),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => LoginScreen()),
+                          );
+                        },
+                        child: const AppText(
+                          name: 'Login',
+                          color: Colors.blue,
+                          fontsize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

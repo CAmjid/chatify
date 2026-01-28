@@ -18,36 +18,46 @@ class _BottombarScreenState extends State<BottombarScreen> {
   @override
   Widget build(BuildContext context) {
     final controller = Provider.of<Controller>(context);
+
+    const green = Color.fromARGB(255, 46, 20, 151);
+
+    Widget navIcon(IconData icon, int index) {
+      final isSelected = controller.selectedindex == index;
+
+      return Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: isSelected ? green.withOpacity(0.18) : Colors.transparent,
+          shape: BoxShape.rectangle,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Icon(
+          
+          icon, color: isSelected ? green : Colors.grey.shade500),
+      );
+    }
+
     return Scaffold(
       body: pages[controller.selectedindex],
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: controller.selectedindex,
-        onTap: (index) {
-          controller.changeData(index);
-        },
-        selectedItemColor: const Color.fromARGB(255, 38, 20, 142),
-        unselectedItemColor: Colors.grey,
+        onTap: controller.changeData,
         selectedFontSize: 12,
         unselectedFontSize: 11,
 
         items: [
           BottomNavigationBarItem(
-            icon: controller.selectedindex == 0
-                ? Icon(Icons.chat_outlined)
-                : Icon(Icons.chat_rounded),
+            icon: navIcon(
+              Icons.chat_outlined, 0),
             label: 'Chats',
           ),
           BottomNavigationBarItem(
-            icon: controller.selectedindex == 1
-                ? Icon(Icons.add_card_outlined)
-                : Icon(Icons.add_circle),
+            icon: navIcon(Icons.update_outlined, 1),
             label: 'Updates',
           ),
           BottomNavigationBarItem(
-            icon: controller.selectedindex == 2
-                ? Icon(Icons.phone_outlined)
-                : Icon(Icons.phone),
+            icon: navIcon(Icons.phone_outlined, 2),
             label: 'Calls',
           ),
         ],

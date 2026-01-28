@@ -20,6 +20,13 @@ class ChatScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 239, 235, 235),
       appBar: AppBar(
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: Icon(Icons.phone_outlined, size: 20),
+          ),
+          IconButton(onPressed: () {}, icon: Icon(Icons.more_vert, size: 20)),
+        ],
         leading: const BackButton(),
         title: Row(
           children: [

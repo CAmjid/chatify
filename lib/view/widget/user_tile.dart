@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:chatify/view/widget/app_text.dart';
 import 'package:flutter/material.dart';
 
@@ -39,7 +37,7 @@ class UserTile extends StatelessWidget {
                 child: AppText(
                   name: name[0].toUpperCase(),
                   fontWeight: FontWeight.bold,
-                  color: Colors.blue,
+                  color: Color.fromARGB(255, 46, 20, 151),
                 ),
               ),
               const SizedBox(width: 12),

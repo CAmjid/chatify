@@ -26,6 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final chatController = Provider.of<ChatController>(context);
+    final log = Provider.of<AuthController>(context);
 
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
@@ -40,12 +41,15 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         elevation: 1,
         actions: [
-          IconButton(onPressed: () {}, icon: Icon(Icons.qr_code_scanner)),
+          IconButton(
+            onPressed: () {},
+            icon: Icon(Icons.qr_code_scanner, size: 20),
+          ),
           PopupMenuButton<String>(
             onSelected: (value) {
               if (value == 'settings') {
               } else if (value == 'logout') {
-                showLogoutDialog(context);
+                showLogoutDialog(context, log);
               }
             },
             itemBuilder: (context) => const [
@@ -111,7 +115,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       user['name'].toString().trim().isNotEmpty)
                   ? user['name']
                   : user['email'];
-
               return UserTile(
                 name: userName[0],
                 text: userName,
@@ -167,25 +170,27 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void showLogoutDialog(BuildContext context) {
+  void showLogoutDialog(BuildContext context, AuthController log) {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (dialogContext) {
+      builder: (Context) {
         return AlertDialog(
           title: const Text('Logout'),
           content: const Text('Are you sure you want to logout?'),
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(dialogContext).pop();
+                Navigator.pop(Context);
               },
               child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () async {
-                Navigator.pop(dialogContext);
-                await context.read<AuthController>().logout();
+                Navigator.pop(Context);
+                await log.logout();
+
+                if (!context.mounted) return;
 
                 Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (_) => const LoginScreen()),

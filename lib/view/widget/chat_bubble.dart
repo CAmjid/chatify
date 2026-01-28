@@ -61,4 +61,3 @@ class ChatBubble extends StatelessWidget {
   }
 }
 
-// const Color(0xffDCF8C6)

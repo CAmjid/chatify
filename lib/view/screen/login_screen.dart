@@ -88,8 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 password.text.trim(),
                               );
 
-                              if (!mounted)
-                                return; // ✅ Check if widget is still active
+                              if (!mounted) return;
 
                               if (success) {
                                 Navigator.pushReplacement(
